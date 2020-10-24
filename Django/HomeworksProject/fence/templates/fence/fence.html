@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block head %}
+   
+{% endblock %}
+{% block body %}
+<div class="container">
+    <div class='col-md-4'>
+        <h2>Fence Definition</h2>
+        <br>
+          <form action="" method="post">
+          <table>
+                {% csrf_token %}
+                {{ form|crispy }}
+          </table>
+                <input type="submit" value="Submit">
+          </form> 
+          <br>
+          <br>
+                
+
+    </div>
+    <div class='col-md-4'>
+       <h2>Fence Design Output</h2>
+       {% if rawNum %}
+       <div>
+         <h3> Total needed raw planks: {{ rawNum }}</h3>
+         <a href="#rawlist">See detailed list.</a>
+       </div>
+       {% endif %}
+       {% for image in images %}
+       <div>
+       <br>
+
+       <br>
+       <img src="data:image/png;base64,{{ image|safe }}" width="600" >
+       </div>
+       {% endfor %}
+       
+       {% if rawNum %}
+          <div id="rawlist">
+              <h3>Detailed Raw Cut List</h3>
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Nr.</th>
+                    <th scope="col">How to cut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for plank in rawList %}
+                  <tr>
+                     <th>
+                        {{ plank.0 }}
+                     </th>
+                     <th>
+                       {{ plank.1 }}
+                     </th>
+                  </tr>
+                  {% endfor %}
+                </tbody>  
+              </table>
+          </div>
+          {% endif %}       
+       
+    </div>
+</div>
+ {% endblock %}

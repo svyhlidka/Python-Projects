@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block head %}
+<h1>Profile</h1>
+{% endblock %}
+{% block body %}
+<div class="container">
+   <h1>Profile</h1>
+   <p>username:   {{user}}</p>
+   <p>first name: {{user.first_name}} </p>
+   <p>last name:  {{user.last_name}} </p>
+   <p>email:      {{user.email}} </p>
+   {% if user.userprofile.image %}
+       <img src="{{ user.userprofile.image.url }}" width="240" >
+    {% endif %}
+</div>
+{% endblock %}
