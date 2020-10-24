@@ -1,0 +1,44 @@
+{% extends "mssql/layout.html" %}
+
+{% block "body" %}
+<h1> Airports</h1>
+<table border = "1">
+   <tr>
+       <th>Id</th>
+       <th>Code</th>
+       <th>City</th>
+       <th>Created</th>
+   </tr>
+   {% for airport in all_airports %}
+   <tr>
+       <td>{{airport.airport_id}}</td>
+       <td>{{airport.airport}}</td>
+       <td>{{airport.city}}
+       <td>{{airport.created}}
+    </tr>
+   {% endfor %}
+</table>
+   <h1>Flight List</h1>
+   <table border = "1">
+   <tr>
+       <th style="width:40px; text-align: center;">Id</th>
+       <th>Departure</th>
+       <th>Arrival</th>
+       <th>Duration</th>
+   </tr>
+   {% for flight in all_flights %}
+   <tr>
+       <td style="width:40px; text-align: center;">
+       <a href="{% url 'mssql:flight_by_id' flight.flight_id %}">
+          {{flight.flight_id}}
+       </a>
+       </td>
+       <td>{{flight.departure}}</td>
+       <td>{{flight.arriva}}</td>
+       <td>{{flight.duration}}</td>
+    </tr>
+   {% endfor %}
+</table>
+
+
+ {% endblock %}

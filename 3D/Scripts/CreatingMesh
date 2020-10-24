@@ -1,0 +1,145 @@
+import bpy
+
+import numpy as np
+
+
+def loadList(filename):
+    # the filename should mention the extension 'npy'
+    tempNumpyArray=np.load(filename, allow_pickle=True)
+    return tempNumpyArray.tolist()
+
+#planksList=loadList('C:/temp/planksList.npy') 
+
+#if (ff.planksList[0].plank[3]==ff.planksList[0].plank[4]).all():
+#print('---------------------')
+#print(planksList[0].plank)
+
+#planks = []
+#for p in ff.planksList:
+#    planks.append((np.round(p.plank,3).tolist()))
+
+planks = [
+    [[0.021, 0.0], [0.146, 0.0], [1.136, 0.99], [1.011, 0.99], [1.011, 0.99]],
+[[0.167, 0.0], [0.292, 0.0], [1.282, 0.99], [1.157, 0.99], [1.157, 0.99]],
+[[0.313, 0.0], [0.438, 0.0], [1.428, 0.99], [1.303, 0.99], [1.303, 0.99]],
+[[0.459, 0.0], [0.584, 0.0], [1.574, 0.99], [1.449, 0.99], [1.449, 0.99]],
+[[0.605, 0.0], [0.73, 0.0], [1.72, 0.99], [1.595, 0.99], [1.595, 0.99]],
+[[0.751, 0.0], [0.876, 0.0], [1.866, 0.99], [1.741, 0.99], [1.741, 0.99]],
+[[0.897, 0.0], [1.022, 0.0], [2.012, 0.99], [1.887, 0.99], [1.887, 0.99]],
+[[1.043, 0.0], [1.168, 0.0], [2.158, 0.99], [2.033, 0.99], [2.033, 0.99]],
+[[1.189, 0.0], [1.314, 0.0], [2.304, 0.99], [2.179, 0.99], [2.179, 0.99]],
+[[1.335, 0.0], [1.46, 0.0], [2.45, 0.99], [2.325, 0.99], [2.325, 0.99]],
+[[1.481, 0.0], [1.606, 0.0], [2.596, 0.99], [2.471, 0.99], [2.471, 0.99]],
+[[1.627, 0.0], [1.752, 0.0], [2.742, 0.99], [2.617, 0.99], [2.617, 0.99]],
+[[1.773, 0.0], [1.898, 0.0], [2.888, 0.99], [2.763, 0.99], [2.763, 0.99]],
+[[1.919, 0.0], [2.044, 0.0], [2.93, 0.886], [2.93, 0.99], [2.909, 0.99]],
+[[2.065, 0.0], [2.189, 0.0], [2.93, 0.741], [2.93, 0.865], [2.93, 0.865]],
+[[2.21, 0.0], [2.335, 0.0], [2.93, 0.595], [2.93, 0.72], [2.93, 0.72]],
+[[2.356, 0.0], [2.481, 0.0], [2.93, 0.449], [2.93, 0.574], [2.93, 0.574]],
+[[2.502, 0.0], [2.627, 0.0], [2.93, 0.303], [2.93, 0.428], [2.93, 0.428]],
+[[2.648, 0.0], [2.773, 0.0], [2.93, 0.157], [2.93, 0.282], [2.93, 0.282]],
+[[2.794, 0.0], [2.919, 0.0], [2.93, 0.011], [2.93, 0.136], [2.93, 0.136]],
+[[0.0, 0.124], [0.0, 0.0], [0.99, 0.99], [0.866, 0.99], [0.866, 0.99]],
+[[0.0, 0.27], [0.0, 0.145], [0.845, 0.99], [0.72, 0.99], [0.72, 0.99]],
+[[0.0, 0.416], [0.0, 0.291], [0.699, 0.99], [0.574, 0.99], [0.574, 0.99]],
+[[0.0, 0.562], [0.0, 0.437], [0.553, 0.99], [0.428, 0.99], [0.428, 0.99]],
+[[0.0, 0.708], [0.0, 0.583], [0.407, 0.99], [0.282, 0.99], [0.282, 0.99]],
+[[0.0, 0.854], [0.0, 0.729], [0.261, 0.99], [0.136, 0.99], [0.136, 0.99]],
+[[0.0, 1.0], [0.0, 0.875], [0.115, 0.99], [0.0, 0.99], [0.0, 0.99]]
+]
+
+class FenceProject(bpy.types.Operator):
+    
+    bl_idname  = "object.fence_project"
+    bl_label   = "Fence Project"
+    bl_options = {'REGISTER', 'UNDO'} 
+
+
+    def createMesh(self, plank, z):
+        """
+           plank - array to be append
+           z - z-coordinate
+           returns 
+        """
+        verts = []
+        edges = []
+        faces = []
+        
+        j = len(plank)-(plank[3]==plank[4]) # omitting 5th vertex if same
+        for i in range(j):
+            verts.append([ plank[i][0], 0.0, plank[i][1]]) #swapping y to z
+        for i in range(j):
+            verts.append([ plank[i][0], z, plank[i][1]]) #swapping y to z
+        #print('verts: ', verts) 
+        
+        
+        edges.extend([[0,1], [1,2], [2,3]])
+        if j == 5:
+            edges.extend([[3,4], [4,0]])
+        else:
+            edges.append([3,0])
+        if j == 5:
+            edges.extend([[5,6], [6,7], [7,8], [8,9],[9,0],[0,5],[1,6],[2,7],[3,8],[4,9]])
+        else:
+            edges.extend([[4,5], [5,6], [6,7],[7,4],[0,4],[1,5],[2,6],[3,7]])
+            
+        #print('edges: ', edges)
+
+        if j == 5:
+            faces = [
+                [0,1,2,3,4],[5,6,7,8,9],  
+                [0,1,6,5],[1,2,7,6],[2,3,8,7],[3,4,9,8],[4,0,5,9]
+            ]
+        else:
+            faces = [
+                [0,1,2,3],[4,5,6,7],
+                [0,1,5,4],[1,2,6,5],[2,3,7,6] ,[3,0,4,7]
+            ]
+        return verts, edges, faces
+    
+    def execute(self, context): 
+
+#verts, edges, faces = createMesh(planks[0],0.018) 
+#i=20
+#verts, edges, faces = createMesh(planks[i],0.018) 
+#name = f'The Plank Nr.{i}'
+#mesh = bpy.data.meshes.new(name) 
+#mesh.from_pydata(verts, edges, faces)    
+#obj  = bpy.data.objects.new(name, mesh)
+#bpy.context.collection.objects.link(obj)
+#bpy.context.view_layer.objects.active = obj
+
+#mod_skin = obj.modifiers.new('Skin','SKIN')
+
+        i=1
+        for plank in planks:
+            verts, edges, faces = self.createMesh(plank,0.018) 
+            name = f'The Plank Nr.{i}'
+            mesh = bpy.data.meshes.new(name) 
+            mesh.from_pydata(verts, edges, faces)    
+            obj  = bpy.data.objects.new(name, mesh)
+            bpy.context.collection.objects.link(obj)
+            bpy.context.view_layer.objects.active = obj
+            if i==1:
+                new_mat = bpy.data.materials.new(name = "Plank Material")
+            so = bpy.context.active_object
+            so.data.materials.append(new_mat)
+            bpy.context.object.active_material.diffuse_color = (0.394, 0.968, 0.420, 1) #change color
+            i += 1
+        return {'FINISHED'}
+
+
+def register():
+    bpy.utils.register_class(FenceProject)
+
+
+def unregister():
+    bpy.utils.unregister_class(FenceProject)
+
+
+if __name__ == "__main__":
+    register()
+
+    # test call
+    bpy.ops.object.fence_project()
+    

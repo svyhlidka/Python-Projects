@@ -1,0 +1,20 @@
+{% extends "mssql/layout.html" %}
+
+
+{% block "body" %}
+<h1>Bingo! new airport</h1>
+      <table border = "1" bordercolor = "green" bgcolor = "orange">
+         <tr>
+            <td>
+              <h2>Airports List</h2>
+            </td>
+            <td>
+               <h2>New Airport</h2>
+                  <form method="POST" class="airport-form">{% csrf_token %}
+                     {{ form.as_p }}
+                     <button type="submit" class="save btn btn-default">Save</button>
+                   </form>
+            </td>
+         </tr>
+     </table>       
+{% endblock %}     
