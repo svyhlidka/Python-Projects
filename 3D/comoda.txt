@@ -1,0 +1,14 @@
+Left Inner Side - 0.018m x 0.400m x 0.530m
+Right Inner Side - 0.018m x 0.400m x 0.530m
+Right Side - 0.018m x 0.400m x 0.530m
+Left Side - 0.018m x 0.400m x 0.530m
+Bottom - 0.018m x 0.418m x 2.000m
+Back - 0.018m x 0.530m x 2.000m
+Middle Top - 0.018m x 0.400m x 1.000m
+Left Shelf - 0.018m x 0.350m x 0.462m
+Right Shelf - 0.018m x 0.350m x 0.462m
+Left Top - 0.018m x 0.418m x 0.500m
+Right Top - 0.018m x 0.418m x 0.500m
+Middle Door - 1.000m x 0.400m x 0.018m
+Left Door - 0.500m x 0.018m x 0.570m
+Left Door.001 - 0.018m x 0.500m x 0.570m
