@@ -1,0 +1,13 @@
+
+import bpy
+
+vert = bpy.context.object.data.vertices
+
+bpy.ops.object.mode_set(mode='OBJECT')
+
+for v in vert:
+    v.select = v.co.z < 0.745
+        
+bpy.ops.object.mode_set(mode = 'EDIT') 
+bpy.ops.mesh.delete(type='VERT')
+bpy.ops.object.mode_set(mode = 'OBJECT')

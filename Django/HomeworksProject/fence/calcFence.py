@@ -79,7 +79,7 @@ class Plank(object):
         else:
             self.plank_length = max(a, b)
             
-        return self.plank_length
+        return round(self.plank_length,3)
 
        
     def calculate_plank_Horizontal(self, frame_length, frame_height, x, y,
@@ -456,14 +456,16 @@ class Fence(object):
         -------
         consumed : list
             list of lists [raw plank number, list[planks lengths cut from raw plank]]
-
+            if empty, longer raw_plank needed
         """
         a_list = self.cumulateAndsortPlanksList()
+        if a_list[0][0] > raw_plank_length:
+            return []
         consumed = []
         nr = 1
-        while a_list:   
+        while a_list: 
             a_list, used = self.consumeSourcePlank(raw_plank_length, a_list, reserve_cut)
             consumed.append([nr,used])
-            nr +=1
+            nr += 1
         return consumed
 
