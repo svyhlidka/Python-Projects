@@ -13,6 +13,10 @@ Created on Tue Sep 15 21:30:53 2020
 
 see document "Planks - 2D Model.ipynb"
 
+framesList = [[2.93,.99]]
+#    [2.80,1.71],[2.81,0.90],[2.81,0.90],
+#    [2.81,0.90],[2.60,1.71],[2.81,1.71]
+
 """
 
 # -*- coding: utf-8 -*-
@@ -25,15 +29,19 @@ class Plank(object):
     
     def __init__(self, width):
         """
-           position: 
+           plank_name:
+           string
+           position:
            float in meters
            list [x,y] of point A
            width:
            float in meters
-           plank: array [A,B,C,D,E]
+           plank: array [A,B,C,D,E] A: left down, B:right down, C: right up
+                                                 D: middle up, E: left up
            E added for frame corner/plank crash handling
            color: list of strings e.g. 'blue'
         """
+        self.plank_name = ''
         self.positionA = [0.,0.]
         self.plank_width = width
         self.plank_length = 0
@@ -64,22 +72,15 @@ class Plank(object):
 
         """
 
-        if self.plank[3][0] != self.plank[4][0] or self.plank[3][1] != self.plank[4][1]:
-            xmin = (self.plank[1][0]+self.plank[0][0])/2
-            ymin = (self.plank[1][1]+self.plank[0][1])/2
-            xmax = max(self.plank[2][0],self.plank[3][0])
-            ymax = max(self.plank[2][1],self.plank[3][1])
+        if self.plank[4][0] != self.plank[3][0] or self.plank[4][1] != self.plank[3][1]:
+            res = round(np.sqrt(np.sum((self.plank[0]-self.plank[3])**2)),3)
         else:
-            xmax, ymax = self.plank.max(axis=0)
-            xmin, ymin = self.plank.min(axis=0)
-        a=round(np.sqrt(np.sum((self.plank[3] - self.plank[0]) ** 2)),3)
-        b=round(np.sqrt(np.sum((self.plank[2] - self.plank[1]) ** 2)),3)
-        if a == b:
-            self.plank_length = a + apply_corr*corr
-        else:
-            self.plank_length = max(a, b)
-            
-        return round(self.plank_length,3)
+            a = np.sqrt(np.sum((self.plank[0] - self.plank[4])**2)) 
+            b = np.sqrt(np.sum((self.plank[1] - self.plank[2])**2))
+            if a == b: res = a + apply_corr * corr
+            else: res = np.maximum(a, b)
+        self.plank_length = round(res,3)
+        return self.plank_length
 
        
     def calculate_plank_Horizontal(self, frame_length, frame_height, x, y,
@@ -216,8 +217,9 @@ class Plank(object):
             return True # for future use?
  
 class fenceFrame(object):
-    def __init__(self, frame_length, frame_height, frame_angle, plank_angle,
-        plank_width, space_width, plank_color, show_frame, frame_width, frame_color, reserve_cut, apply_corr):
+    def __init__(self, frame_Id, frame_length, frame_height, frame_angle, plank_angle,
+        plank_width, space_width, plank_color, show_frame, frame_width, frame_color,
+        reserve_cut, apply_corr):
         """
         frame_length, frame_height, plank_width, space_width: float in meters
         angle: float in degrees
@@ -237,10 +239,11 @@ class fenceFrame(object):
         self.show_frame   = show_frame
         self.reserve_cut  = reserve_cut
         self.apply_corr   = apply_corr
-        self.planksList = []
-        self.planksLengths = []
+        self.planksList   = []
+        self.planksLengths = {} 
         self.total_plank_length = 0
-        
+        self.frame_Id = frame_Id # frame Id for prcessing more frames
+        self.frame_name = f'{frame_length:.3f}x{frame_height:.3f}'
         
         if self.plank_angle in [0, 90]:
             self.tanFi   = 0
@@ -257,7 +260,8 @@ class fenceFrame(object):
             self.deltaV  = ((space_width)/np.cos(np.radians(self.plank_angle))) # horizontal distance
             self.plankH  = ((plank_width)/np.sin(np.radians(self.plank_angle))) # plank width (in  verical direction)
             self.plankV  = ((plank_width)/np.cos(np.radians(self.plank_angle))) # plank width (in horizontal direction)
-            
+        self.corr = self.tanFi*self.plank_width
+        
         self.frame = []
         if self.show_frame:    
             xy=[(-1*self.frame_width, -1*self.frame_width), (-1*self.frame_width, 0.0),
@@ -285,7 +289,7 @@ class fenceFrame(object):
         """
         total = 0
         for l in self.planksLengths:
-            total += (l+self.reserve_cut)
+            total += (self.planksLengths[l]+self.reserve_cut)
         self.total_plank_length = round(total,3)
         return round(total,3)
 
@@ -299,7 +303,8 @@ class fenceFrame(object):
             while x < self.frame_length + self.space_width:
                 plank.calculate_plank_0(self.plank_angle, self.frame_length, self.frame_height, x, y, self.plank_width, self.space_width)
                 self.planksList.append(plank)
-                self.planksLengths.append(self.frame_height)
+                plank.plank_name = self.frame_Id + '/' + str(len(self.planksList))
+                self.planksLengths[plank.plank_name] = self.frame_height
                 x += (self.plank_width + self.space_width)
                 i += 1
                 plank=Plank(self.plank_width)
@@ -311,7 +316,8 @@ class fenceFrame(object):
             while y < self.frame_height+self.space_width:
                 plank.calculate_plank_0(self.plank_angle, self.frame_length, self.frame_height, x, y, self.plank_width, self.space_width)
                 self.planksList.append(plank)
-                self.planksLengths.append(self.frame_length)
+                plank.plank_name = self.frame_Id + '/' + str(len(self.planksList))
+                self.planksLengths[plank.plank_name] = self.frame_length
                 y += (self.plank_width + self.space_width)
                 i += 1
                 plank=Plank(self.plank_width)
@@ -328,7 +334,8 @@ class fenceFrame(object):
                             self.tanFi, self.plankH, self.plankV, self.deltaH, self.deltaV)
             if ok:
                 self.planksList.append(plank)
-                self.planksLengths.append(plank.plank_Length(self.apply_corr, self.tanFi*self.plank_width))
+                plank.plank_name = self.frame_Id + '/' + str(len(self.planksList))
+                self.planksLengths[plank.plank_name] = plank.plank_Length(self.apply_corr, self.corr)
                 i += 1
                 x = plank.plank[1][0]+self.deltaH
                 plank=Plank(self.plank_width)
@@ -349,7 +356,8 @@ class fenceFrame(object):
                               self.tanFi, self.plankH, self.plankV, self.deltaH, self.deltaV)
             if ok:
                 self.planksList.append(plank)
-                self.planksLengths.append(plank.plank_Length(self.apply_corr, self.tanFi*self.plank_width))
+                plank.plank_name = self.frame_Id + '/' + str(len(self.planksList))
+                self.planksLengths[plank.plank_name] = plank.plank_Length(self.apply_corr, self.corr)
                 i += 1
                 x = plank.plank[1][0]+self.deltaH
                 y = (self.frame_length-x)*self.tanFi-self.deltaV
@@ -368,14 +376,15 @@ class fenceFrame(object):
                               self.tanFi, self.plankH, self.plankV, self.deltaH, self.deltaV)
             if ok:
                 self.planksList.append(plank)
-                self.planksLengths.append(plank.plank_Length(self.apply_corr, self.tanFi*self.plank_width))
+                plank.plank_name = self.frame_Id + '/' + str(len(self.planksList))
+                self.planksLengths[plank.plank_name] = plank.plank_Length(self.apply_corr, self.corr)
                 i += 1
                 y = plank.plank[0][1]+self.deltaV
                 plank=Plank(self.plank_width)
 
 class Fence(object):
     def __init__(self):
-        self.framesList = []
+        self.framesList = [] 
 
     def __str__(self):
         return f'Object Fence contains {len(self.framesList)} frames'
@@ -392,11 +401,11 @@ class Fence(object):
         sorted list desc by length of tuples: (plank length, number of planks given length)
 
         """
-        allPlanks = []
+        allPlanks = {}
         for frame in self.framesList:
-            allPlanks.extend(frame.planksLengths)
-        a = sorted(dict(Counter(j for j in allPlanks)).items(), key=lambda x: x, reverse=True) 
-        return [[x,y] for (x,y) in a]
+            allPlanks.update(frame.planksLengths)
+        a = dict(sorted(allPlanks.items(), key=lambda item: item[1], reverse=True))
+        return [[x,a[x]] for (x) in a]
     
 
     def find_longest(self, rest, a_list):
@@ -409,7 +418,7 @@ class Fence(object):
         """
         for i in range(len(a_list)):
             #if a_list[i][0] <= rest:
-            if a_list[i][0] <= rest:
+            if a_list[i][1] <= rest:
                 return i
         return -1
 
@@ -426,27 +435,24 @@ class Fence(object):
                                                   consumed source plank)
         """
         used = []
-        min = a_list[len(a_list)-1][0]
+        min = a_list[len(a_list)-1][1]
         while rest > min:
             i = self.find_longest(rest, a_list) 
             if i >= 0:
-                rest = rest-a_list[i][0]-reserve_cut
-                used.append(a_list[i][0])
-                a_list[i][1] -= 1
-                if not a_list[i][1]:
-                    del a_list[i]
-                    if a_list:
-                        min = a_list[len(a_list)-1][0]
-                    else:
-                        return a_list, used
+                rest = rest-a_list[i][1]-reserve_cut
+                used.append(a_list[i])
+                del a_list[i]
+                if a_list:
+                    min = a_list[len(a_list)-1][1]
+                else:
+                    return a_list, used
             else:
                 return a_list, used
         return a_list, used
-    
+
     def calculateRawMaterialNeeds(self, raw_plank_length, reserve_cut):
         """
         
-
         Parameters
         ----------
         raw_plank_length : float
@@ -459,7 +465,7 @@ class Fence(object):
             if empty, longer raw_plank needed
         """
         a_list = self.cumulateAndsortPlanksList()
-        if a_list[0][0] > raw_plank_length:
+        if a_list[0][1] > raw_plank_length:
             return []
         consumed = []
         nr = 1
@@ -468,4 +474,3 @@ class Fence(object):
             consumed.append([nr,used])
             nr += 1
         return consumed
-

@@ -10,23 +10,6 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-# class RenewBookForm(forms.Form):
-#     renewal_date = forms.DateField(help_text="Enter a date between now and 4 weeks (default 3).")
-
-#     def clean_renewal_date(self):
-#         data = self.cleaned_data['renewal_date']
-        
-#         # Check if a date is not in the past. 
-#         if data < datetime.date.today():
-#             raise ValidationError(_('Invalid date - renewal in past'))
-
-#         # Check if a date is in the allowed range (+4 weeks from today).
-#         if data > datetime.date.today() + datetime.timedelta(weeks=4):
-#             raise ValidationError(_('Invalid date - renewal more than 4 weeks ahead'))
-
-#         # Remember to always return the cleaned data.
-#         return data
-
 
 COLORS = [
     ('blue', 'Blue'),
@@ -48,7 +31,7 @@ class FenceDefinitionForm(forms.Form):
 
     frames_dimensions = forms.CharField(required=True, 
                     label='Frames Dimensions:',
-                    help_text="Each line One Frame in format e.g. 3.125x2.869 in meters. No other characters are valid!",
+                    help_text="One Frame per Line in the format e.g. 3.125x2.869 in meters. No other characters are valid!",
                     widget=forms.Textarea(attrs={'rows': '6', 'cols': '15'}))
     plank_width  = forms.FloatField(label='Plank Width:',required=True,help_text = "Perpendicular width of the plank in meters.")
     space_width  = forms.FloatField(label='Distance:',
@@ -73,8 +56,10 @@ class FenceDefinitionForm(forms.Form):
     )
     raw_plank_length = forms.FloatField(label='Raw Plank Length:',required=False,
                     help_text = "The length of the board from which planks will be cut in meters.")
-    apply_corr   = forms.BooleanField(label='Apply correction:',
+    apply_corr       = forms.BooleanField(label='Apply correction:',
                     required=False,help_text='Check, if you want to apply correction in plank length calculation as reserve for cut.')
+    print_plank_name   = forms.BooleanField(label='Print plank name:',
+                    required=False,help_text='Check, if you want to print plank name in image')
     # frame_angle = 90  # frame angle not implemented yet
     
 
