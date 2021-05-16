@@ -72,16 +72,12 @@ class Plank(object):
 
         """
 
-        if self.plank[4][0] != self.plank[3][0] or self.plank[4][1] != self.plank[3][1]:
-            res = round(np.sqrt(np.sum((self.plank[0]-self.plank[3])**2)),3)
-        else:
-            a = np.sqrt(np.sum((self.plank[0] - self.plank[4])**2)) 
-            b = np.sqrt(np.sum((self.plank[1] - self.plank[2])**2))
-            if a == b: res = a + apply_corr * corr
-            else: res = np.maximum(a, b)
+        a = np.sqrt(np.sum((self.plank[0] - self.plank[4])**2)) 
+        b = np.sqrt(np.sum((self.plank[1] - self.plank[2])**2))
+        if a == b: res = a + apply_corr * corr
+        else: res = np.maximum(a, b)
         self.plank_length = round(res,3)
         return self.plank_length
-
        
     def calculate_plank_Horizontal(self, frame_length, frame_height, x, y,
                                    tanFi, plankH, plankV, deltaH, deltaV):
@@ -199,7 +195,7 @@ class Plank(object):
          for angle = 0 or 90  deg only
          returns np.array(A,B,C,D) rounded to 3 dec.points
         """
-        if angle > 0:
+        if 90 > angle > 0:
             self.plank[0] = [x, 0]
             self.plank[1] = [x + plank_width, 0]
             self.plank[2] = [x + plank_width, frame_height]
