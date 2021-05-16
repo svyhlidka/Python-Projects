@@ -57,7 +57,7 @@ class FenceDefinitionForm(forms.Form):
     raw_plank_length = forms.FloatField(label='Raw Plank Length:',required=False,
                     help_text = "The length of the board from which planks will be cut in meters.")
     apply_corr       = forms.BooleanField(label='Apply correction:',
-                    required=False,help_text='Check, if you want to apply correction in plank length calculation as reserve for cut.')
+                    required=False,help_text='Check, if you want to apply correction in plank length calculation as reserve for perpendicular cut.')
     print_plank_name   = forms.BooleanField(label='Print plank name:',
                     required=False,help_text='Check, if you want to print plank name in image')
     # frame_angle = 90  # frame angle not implemented yet
